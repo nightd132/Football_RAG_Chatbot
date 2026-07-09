@@ -3,11 +3,22 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
-from config import CHUNK_OVERLAP, CHUNK_SIZE
+from config import CHUNK_OVERLAP, CHUNK_SIZE, VECTOR_STORE_DIR
 from models import load_embedding_model
 
+from pathlib import Path
+
+url_file = Path("data/urls.txt")
+
+
+
 jina = "http://r.jina.ai/"
-source_urls = ["https://en.wikipedia.org/wiki/FIFA_World_Cup", "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026", "https://www.bbc.com/sport/football/world-cup"]
+with url_file.open("r", encoding="utf-8") as f:
+    source_urls = [
+        line.strip()
+        for line in f
+        if line.strip() and not line.startswith("#")
+    ]
 
 urls = []
 
@@ -18,8 +29,13 @@ splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=C
 
 loader = WebBaseLoader(web_paths=urls)
 docs = loader.load()
+
+for doc in docs:
+    doc.metadata["source"] = doc.metadata["source"][len(jina):]
+
 chunks = splitter.split_documents(docs)
+print(docs[0].page_content)
 
 embedding = load_embedding_model()
 
-vectorstore = Chroma.from_documents(chunks, embedding, persist_directory="chroma_db")
+vectorstore = Chroma.from_documents(chunks, embedding, persist_directory=VECTOR_STORE_DIR)

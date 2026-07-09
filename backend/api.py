@@ -14,11 +14,12 @@ class ChatRequest(BaseModel):
     query: str
 
 @app.post("/chat")
-def chat(request: ChatRequest):
+async def chat(request: ChatRequest):
     query = request.query
     documents = search_vector_space(vectorstore, query)
     answer = generate_answer(llm, query, documents)
-    return {"answer": answer}
+    sources = {document.metadata["source"] for document in documents}
+    return {"answer": answer, "sources": sources}
 
 @app.get("/health")
 def health_check():
