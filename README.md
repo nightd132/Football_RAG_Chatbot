@@ -3,7 +3,9 @@
 
 ## Overview
 
-This project is about building a small RAG chatbot using local Ollama qwen2.5:3B model(because using Gemini free tier has limitation and other like OpenAi has free), which can answer some football question base on some external sources.
+- This project is about building a small RAG chatbot using local Ollama qwen2.5:3B model(because using Gemini free tier has limitation and other like OpenAi has free), which can answer some football question base on some external sources.
+- Here I just use wikipedia corresponds with the World Cup 2026.
+
 
 ## Demo
 
